@@ -1,13 +1,13 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-
 import { LoggerMiddleware } from './common/middleware/logger/logger.middleware';
 import { UploadModule } from './upload/upload.module';
 import { SsoModule } from './sso/sso.module';
 import { UsersModule } from './users/users.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import configurationFactory from './common/config/configuration.factory';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
@@ -17,6 +17,15 @@ import configurationFactory from './common/config/configuration.factory';
     ConfigModule.forRoot({
       load: [configurationFactory],
       isGlobal: true,
+    }),
+    HttpModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: (config: ConfigService) => {
+        return {
+          timeout: config.get('HTTP_TIMEOUT'),
+        };
+      },
+      inject: [ConfigService],
     }),
   ],
   controllers: [AppController],

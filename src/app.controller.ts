@@ -14,18 +14,20 @@ export class AppController {
     this.appService = this.moduleRef.get(AppService);
   }
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  @Get('todos')
+  getTodos() {
+    return this.appService.getTodos();
   }
 
   @Get('config')
   getConfig() {
     const username = this.configService.get('USERNAME');
     const port = this.configService.get('PORT');
+    const timeout = this.configService.get('HTTP_TIMEOUT');
     return {
       username,
       port,
+      timeout,
     };
   }
 }
