@@ -8,6 +8,7 @@ import { UsersModule } from './users/users.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import configurationFactory from './common/config/configuration.factory';
 import { HttpModule } from '@nestjs/axios';
+import { WeatherModule } from './weather/weather.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { HttpModule } from '@nestjs/axios';
       },
       inject: [ConfigService],
     }),
+    WeatherModule,
   ],
   controllers: [AppController],
   providers: [AppService],

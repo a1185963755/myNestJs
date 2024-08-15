@@ -1,7 +1,8 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { AppService } from './app.service';
 import { ConfigService } from '@nestjs/config';
 import { ModuleRef } from '@nestjs/core';
+import pinyin from 'pinyin';
 
 @Controller()
 export class AppController {
@@ -29,5 +30,13 @@ export class AppController {
       port,
       timeout,
     };
+  }
+
+  @Get('pinyin')
+  getPinyin(@Query('text') text: string) {
+    const res = pinyin(text, {
+      style: pinyin.STYLE_NORMAL,
+    });
+    return res.join('');
   }
 }
