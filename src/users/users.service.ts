@@ -1,11 +1,21 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { User } from './interfaces/user.interface';
+import { InjectEntityManager } from '@nestjs/typeorm';
+import { UserEntity } from './entity/user.entity';
+import { EntityManager } from 'typeorm';
 
 @Injectable()
 export class UsersService {
   private readonly users: User[] = [];
-  create(user: User) {
-    if (this.users.find((item) => item.name == user.name)) {
+  constructor(@InjectEntityManager() private entityManager: EntityManager) {}
+
+  async create(user: User) {
+    const usr = await this.entityManager.find(UserEntity, {
+      where: {
+        username: user.name,
+      },
+    });
+    if (usr.length > 0) {
       throw new HttpException(
         {
           errCode: HttpStatus.BAD_REQUEST,
@@ -14,8 +24,11 @@ export class UsersService {
         HttpStatus.BAD_REQUEST,
       );
     }
-    const newUser = { ...user, id: this.users.length + 1 };
-    this.users.push(newUser);
+    const newUser = this.entityManager.create(UserEntity, {
+      username: user.name,
+      password: user.password,
+    });
+    await this.entityManager.save(newUser);
     return {
       code: 200,
       message: 'success',
@@ -24,20 +37,27 @@ export class UsersService {
       },
     };
   }
-  findAll() {
+  async findAll() {
+    const users = await this.entityManager.find(UserEntity);
+    const total = await this.entityManager.count(UserEntity);
     return {
       code: 200,
       message: 'success',
-      data: this.users,
-      total: this.users.length,
+      data: users,
+      total,
     };
   }
 
   async findOne(username: string) {
+    const user = await this.entityManager.findOne(UserEntity, {
+      where: {
+        username,
+      },
+    });
     return {
       code: 200,
       message: 'success',
-      data: this.users.find((user) => user.name == username),
+      data: user,
     };
   }
 }

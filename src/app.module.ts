@@ -9,10 +9,21 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import configurationFactory from './common/config/configuration.factory';
 import { HttpModule } from '@nestjs/axios';
 import { WeatherModule } from './weather/weather.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
 // import { WechatyModule } from './wechaty/wechaty.module';
 
 @Module({
   imports: [
+    TypeOrmModule.forRoot({
+      type: 'mysql',
+      host: 'localhost',
+      port: 3306,
+      username: 'root',
+      password: 'root',
+      database: 'mydb',
+      entities: [__dirname + '/**/*.entity{.ts,.js}'], // 自动加载实体
+      synchronize: true, // 自动同步数据库（生产环境下建议关闭）
+    }),
     UsersModule,
     UploadModule,
     SsoModule,
