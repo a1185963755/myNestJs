@@ -38,7 +38,6 @@ export class WeatherService {
       ),
     );
     const cityCODE = cityCodeJson?.data?.location?.[0]?.id;
-    console.log('🚀 ~ WeatherService ~ getCityCode ~ cityCODE:', cityCODE);
     if (!cityCODE) {
       throw new HttpException(
         {
