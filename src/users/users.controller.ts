@@ -35,7 +35,7 @@ export class UsersController {
         validation.error.errors.map((e) => e.message).join(', '),
       );
     }
-    return this.usersService.create(validation.data);
+    return this.usersService.register(validation.data);
   }
 
   @Get(':username')

@@ -6,10 +6,9 @@ import { EntityManager } from 'typeorm';
 
 @Injectable()
 export class UsersService {
-  private readonly users: User[] = [];
   constructor(@InjectEntityManager() private entityManager: EntityManager) {}
 
-  async create(user: User) {
+  async register(user: User) {
     const usr = await this.entityManager.find(UserEntity, {
       where: {
         username: user.name,
@@ -24,6 +23,7 @@ export class UsersService {
         HttpStatus.BAD_REQUEST,
       );
     }
+
     const newUser = this.entityManager.create(UserEntity, {
       username: user.name,
       password: user.password,
@@ -38,7 +38,10 @@ export class UsersService {
     };
   }
   async findAll() {
-    const users = await this.entityManager.find(UserEntity);
+    const users = (await this.entityManager.find(UserEntity)).map((user) => ({
+      id: user.id,
+      username: user.username,
+    }));
     const total = await this.entityManager.count(UserEntity);
     return {
       code: 200,
