@@ -44,6 +44,7 @@ export class SsoController {
       );
     }
     const { password, ...others } = data!;
+    console.log('🚀 ~ SsoController ~ getUser ~ password:', password);
     return {
       code: 200,
       message: 'success',
