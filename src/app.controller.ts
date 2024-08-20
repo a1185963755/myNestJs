@@ -16,7 +16,7 @@ export class AppController {
   }
 
   @Get('todos')
-  getTodos() {
+  async getTodos() {
     return this.appService.getTodos();
   }
 
