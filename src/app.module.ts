@@ -11,6 +11,8 @@ import { HttpModule } from '@nestjs/axios';
 import { WeatherModule } from './weather/weather.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 // import { WechatyModule } from './wechaty/wechaty.module';
+import { AuthorizationModule } from './common/authorization/authorization.module';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -41,6 +43,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       inject: [ConfigService],
     }),
     WeatherModule,
+    AuthorizationModule.register({
+      modelPath: join(__dirname, '../casbin/model.conf'),
+      policyAdapter: join(__dirname, '../casbin/policy.csv'),
+      global: true,
+    }),
     // WechatyModule,
   ],
   controllers: [AppController],

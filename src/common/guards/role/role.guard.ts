@@ -1,22 +1,34 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { Request } from 'express';
 import { Observable } from 'rxjs';
+import { AuthorizationService } from 'src/common/authorization';
+
 /**
  * role角色守卫
  */
 @Injectable()
 export class RoleGuard implements CanActivate {
-  constructor(private readonly reflector: Reflector) {}
+  constructor(private readonly authorizationService: AuthorizationService) {}
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    const roles = this.reflector.get<string[]>('roles', context.getHandler());
-    const request = context.switchToHttp().getRequest();
-    const user = request.body.user;
-    return this.matchRoles(roles, user.roles);
-  }
+    const request: Request = context.switchToHttp().getRequest();
+    (request as any).user = { role: 'manager' };
+    const { user, path, method } = request as any;
+    const action = this.authorizationService.mappingAction(method);
 
-  private matchRoles(resources: string[], target: string[]): boolean {
-    return !!resources.find((x) => target.find((y) => y === x));
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+    return this.authorizationService.checkPermission(
+      `role:${user.role}`,
+      path,
+      action,
+    );
   }
 }
