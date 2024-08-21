@@ -4,9 +4,9 @@ import {
   Post,
   Body,
   Header,
-  BadRequestException,
   UseInterceptors,
   UseGuards,
+  UsePipes,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { createUserSchema, CreateUserDto } from './dto/create-user.dto';
@@ -14,6 +14,7 @@ import { HelloWorldInterceptor } from 'src/common/interceptors/hello-world/hello
 
 import { UserName } from 'src/common/decorators/user-id/user-name.decorator';
 import { RoleGuard } from 'src/common/guards/role/role.guard';
+import { ZodValidationPipe } from 'src/pipes/parse-int/zod-validate.pipe';
 
 @Controller('users')
 @UseInterceptors(HelloWorldInterceptor)
@@ -27,15 +28,10 @@ export class UsersController {
   }
 
   @UseGuards(RoleGuard)
-  @Post()
+  @Post('register')
+  @UsePipes(new ZodValidationPipe(createUserSchema))
   async create(@Body() createCatDto: CreateUserDto) {
-    const validation = createUserSchema.safeParse(createCatDto);
-    if (!validation.success) {
-      throw new BadRequestException(
-        validation.error.errors.map((e) => e.message).join(', '),
-      );
-    }
-    return this.usersService.register(validation.data);
+    return this.usersService.register(createCatDto);
   }
 
   @UseGuards(RoleGuard)

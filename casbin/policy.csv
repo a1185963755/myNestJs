@@ -2,7 +2,7 @@ p, role:admin, /users, *
 p, role:admin, /users/:username, *
 p, role:staff, /users, read
 p, role:staff, /users/:username, read
-p, role:manager, /users, create
+p, role:manager, /users/register, create
 p, role:manager, /users/:username, update
 
 g, role:manager, role:staff

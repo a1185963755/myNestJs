@@ -11,7 +11,6 @@ export const createUserSchema = z
       invalid_type_error: 'age必须是数字',
       required_error: 'age必填',
     }),
-    breed: z.string(),
     password: z.string(),
   })
   .strip();

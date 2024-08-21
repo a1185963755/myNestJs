@@ -9,9 +9,9 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { SsoService } from './sso.service';
-import { SsoBody } from './interfaces/sso.interface';
 import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from 'src/users/users.service';
+import { SsoLoginDto } from './dto/sso-login.dto';
 
 @Controller('sso')
 export class SsoController {
@@ -21,7 +21,7 @@ export class SsoController {
   ) {}
 
   @Post('login')
-  async create(@Body() ssoBody: SsoBody) {
+  async create(@Body() ssoBody: SsoLoginDto) {
     const user = await this.ssoService.validateUser(
       ssoBody.username,
       ssoBody.password,
