@@ -16,13 +16,7 @@ export class SsoService {
       console.log('🚀 ~ SsoService ~ validateUser ~ password:', password);
       return result;
     } else {
-      throw new HttpException(
-        {
-          errCode: HttpStatus.BAD_REQUEST,
-          errMsg: 'accessToken失效',
-        },
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException('accessToken失效', HttpStatus.BAD_REQUEST);
     }
   }
 
