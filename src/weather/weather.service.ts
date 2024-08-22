@@ -21,14 +21,15 @@ export class WeatherService {
     );
     if (!weatherJson.data) {
       throw new HttpException(
-        {
-          errCode: 400,
-          errMsg: `未查询到 ${city} 天气数据`,
-        },
+        `未查询到 ${city} 天气数据`,
         HttpStatus.BAD_REQUEST,
       );
     }
-    return weatherJson.data;
+    const { now, fxLink } = weatherJson.data;
+    return {
+      now,
+      link: fxLink,
+    };
   }
 
   async getCityCode(city: string) {
@@ -40,10 +41,7 @@ export class WeatherService {
     const cityCODE = cityCodeJson?.data?.location?.[0]?.id;
     if (!cityCODE) {
       throw new HttpException(
-        {
-          errCode: 400,
-          errMsg: `未查询到城市 ${city} 数据`,
-        },
+        `未查询到城市 ${city} 数据`,
         HttpStatus.BAD_REQUEST,
       );
     }

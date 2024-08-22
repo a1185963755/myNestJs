@@ -10,10 +10,6 @@ export class AppService {
       this.httpService.get('https://jsonplaceholder.typicode.com/todos'),
     );
     const todos = res.data;
-    return {
-      code: 200,
-      message: 'success',
-      data: todos,
-    };
+    return todos;
   }
 }

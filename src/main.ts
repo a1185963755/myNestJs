@@ -3,6 +3,8 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { ClassValidatePipe } from 'src/pipes/parse-int/class-validate.pipe';
+import { TransformIntercepter } from './common/interceptors/transform.interceptor';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   // 配置 CORS
@@ -16,6 +18,7 @@ async function bootstrap() {
   app.enableShutdownHooks();
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalPipes(new ClassValidatePipe());
+  app.useGlobalInterceptors(new TransformIntercepter());
   await app.listen(port);
 }
 bootstrap();

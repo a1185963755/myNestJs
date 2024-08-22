@@ -10,14 +10,14 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { createUserSchema, CreateUserDto } from './dto/create-user.dto';
-import { HelloWorldInterceptor } from 'src/common/interceptors/hello-world/hello-world.interceptor';
 
 import { UserName } from 'src/common/decorators/user-id/user-name.decorator';
 import { RoleGuard } from 'src/common/guards/role/role.guard';
 import { ZodValidationPipe } from 'src/pipes/parse-int/zod-validate.pipe';
+import { DurationInterceptor } from 'src/common/interceptors/duration.interceptor';
 
 @Controller('users')
-@UseInterceptors(HelloWorldInterceptor)
+@UseInterceptors(DurationInterceptor)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
   @UseGuards(RoleGuard)

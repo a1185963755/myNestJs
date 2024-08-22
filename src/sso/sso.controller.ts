@@ -32,23 +32,12 @@ export class SsoController {
   @UseGuards(AuthGuard('jwt'))
   @Get(':username')
   async getUser(@Param('username') username: string) {
-    const { data } = await this.UsersService.findOne(username);
+    const data = await this.UsersService.findOne(username);
     if (!data) {
-      throw new HttpException(
-        {
-          code: 404,
-          message: '用户不存在',
-          data: null,
-        },
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException('用户不存在', HttpStatus.BAD_REQUEST);
     }
     const { password, ...others } = data!;
     console.log('🚀 ~ SsoController ~ getUser ~ password:', password);
-    return {
-      code: 200,
-      message: 'success',
-      data: others,
-    };
+    return others;
   }
 }

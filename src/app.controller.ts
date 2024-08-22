@@ -37,6 +37,8 @@ export class AppController {
     const res = pinyin(text, {
       style: pinyin.STYLE_NORMAL,
     });
-    return res.join('');
+    return {
+      result: res.join(''),
+    };
   }
 }

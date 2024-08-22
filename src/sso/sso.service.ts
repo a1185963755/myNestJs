@@ -10,7 +10,7 @@ export class SsoService {
   ) {}
 
   async validateUser(username: string, pwd: string) {
-    const { data: user } = await this.usersService.findOne(username);
+    const user = await this.usersService.findOne(username);
     if (user && bcrypt.compareSync(pwd, bcrypt.hashSync(user.password, 10))) {
       const { password, ...result } = user;
       console.log('🚀 ~ SsoService ~ validateUser ~ password:', password);
@@ -23,11 +23,7 @@ export class SsoService {
   async login(user: any) {
     const payload = { userId: user.id, username: user.name };
     return {
-      code: 200,
-      message: 'success',
-      data: {
-        access_token: this.jwtService.sign(payload),
-      },
+      access_token: this.jwtService.sign(payload),
     };
   }
 }

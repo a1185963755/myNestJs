@@ -23,13 +23,7 @@ export class UsersService {
       password: user.password,
     });
     await this.entityManager.save(newUser);
-    return {
-      code: 200,
-      message: 'success',
-      data: {
-        ...newUser,
-      },
-    };
+    return newUser;
   }
   async findAll() {
     const users = (await this.entityManager.find(UserEntity)).map((user) => ({
@@ -38,9 +32,7 @@ export class UsersService {
     }));
     const total = await this.entityManager.count(UserEntity);
     return {
-      code: 200,
-      message: 'success',
-      data: users,
+      users,
       total,
     };
   }
@@ -51,10 +43,6 @@ export class UsersService {
         username,
       },
     });
-    return {
-      code: 200,
-      message: 'success',
-      data: user,
-    };
+    return user;
   }
 }

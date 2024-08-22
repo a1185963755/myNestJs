@@ -7,13 +7,13 @@ import {
 import { Observable, tap } from 'rxjs';
 
 @Injectable()
-export class HelloWorldInterceptor implements NestInterceptor {
+export class DurationInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const input = Date.now();
     const handler = next.handle();
     return handler.pipe(
       tap(() => {
-        console.log(`${Date.now() - input}ms`);
+        console.log(`用时${Date.now() - input}ms`);
       }),
     );
   }
