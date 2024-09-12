@@ -4,9 +4,10 @@ import { ConfigService } from '@nestjs/config';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { ClassValidatePipe } from 'src/pipes/parse-int/class-validate.pipe';
 import { TransformIntercepter } from './common/interceptors/transform.interceptor';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   // 配置 CORS
   app.enableCors({
     origin: '*', // 允许的来源，可以设置为具体的前端地址
@@ -19,6 +20,7 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalPipes(new ClassValidatePipe());
   app.useGlobalInterceptors(new TransformIntercepter());
+  app.useStaticAssets('uploads', { prefix: '/static' });
   await app.listen(port);
 }
 bootstrap();
