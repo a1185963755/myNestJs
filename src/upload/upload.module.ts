@@ -34,5 +34,6 @@ import { extname } from 'path';
   ],
   controllers: [UploadController],
   providers: [UploadService],
+  exports: [UploadService],
 })
 export class UploadModule {}

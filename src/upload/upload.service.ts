@@ -1,15 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class UploadService {
   uploadFile(file: Express.Multer.File) {
     if (file === undefined) {
-      return { message: '请选择一个文件' };
+      throw new HttpException('请选择一个文件', HttpStatus.BAD_REQUEST);
     }
+    console.log(file.path);
+    const filePath = file.path.replace('uploads\\', 'static/');
     return {
-      code: 200,
-      message: 'success',
-      file,
+      path: filePath,
     };
   }
 }

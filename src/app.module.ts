@@ -13,7 +13,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 // import { WechatyModule } from './wechaty/wechaty.module';
 import { AuthorizationModule } from './common/authorization/authorization.module';
 import { join } from 'path';
-
+import { BookModule } from './book/book.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -48,6 +48,7 @@ import { join } from 'path';
       policyAdapter: join(__dirname, '../casbin/policy.csv'),
       global: true,
     }),
+    BookModule,
     // WechatyModule,
   ],
   controllers: [AppController],
