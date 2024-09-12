@@ -7,11 +7,11 @@ import { EntityManager } from 'typeorm';
 @Injectable()
 export class UsersService {
   constructor(@InjectEntityManager() private entityManager: EntityManager) {}
-
+  // 注册
   async register(user: User) {
     const usr = await this.entityManager.find(UserEntity, {
       where: {
-        username: user.name,
+        username: user.username,
       },
     });
     if (usr.length > 0) {
@@ -19,12 +19,13 @@ export class UsersService {
     }
 
     const newUser = this.entityManager.create(UserEntity, {
-      username: user.name,
+      username: user.username,
       password: user.password,
     });
     await this.entityManager.save(newUser);
     return newUser;
   }
+
   async findAll() {
     const users = (await this.entityManager.find(UserEntity)).map((user) => ({
       id: user.id,

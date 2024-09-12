@@ -18,7 +18,7 @@ export class ZodValidationPipe implements PipeTransform {
           return item.message;
         })
         .join(',');
-      throw new BadRequestException(`参数校验失败=>${errText}`);
+      throw new BadRequestException(`${errText}`);
     }
   }
 }
