@@ -2,14 +2,16 @@ import { UpdateBookDto } from './dto/update-book.dto';
 import { CreateBookDto } from './dto/create-book.dto';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
-import { EntityManager } from 'typeorm';
+import { EntityManager, Like } from 'typeorm';
 import { BookEntity } from './entity/book.entity';
 
 @Injectable()
 export class BookService {
   constructor(@InjectEntityManager() private entityManager: EntityManager) {}
-  async list() {
-    const books = await this.entityManager.find(BookEntity);
+  async list(name: string) {
+    const books = await this.entityManager.find(BookEntity, {
+      where: { name: Like(`%${name}%`) },
+    });
     return books;
   }
 
@@ -29,7 +31,7 @@ export class BookService {
       },
     });
     if (book.length > 0) {
-      throw new HttpException('书籍已存在，换个名字吧', HttpStatus.BAD_REQUEST);
+      throw new HttpException('书籍已存在，换个名字吧', HttpStatus.OK);
     }
 
     const newBook = this.entityManager.create(BookEntity, {

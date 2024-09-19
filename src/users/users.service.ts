@@ -15,7 +15,7 @@ export class UsersService {
       },
     });
     if (usr.length > 0) {
-      throw new HttpException('用户已存在', HttpStatus.BAD_REQUEST);
+      throw new HttpException('用户已存在', HttpStatus.OK);
     }
 
     const newUser = this.entityManager.create(UserEntity, {

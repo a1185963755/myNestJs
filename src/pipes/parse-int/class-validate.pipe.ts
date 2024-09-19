@@ -1,6 +1,7 @@
 import {
   ArgumentMetadata,
-  BadRequestException,
+  HttpException,
+  HttpStatus,
   PipeTransform,
 } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
@@ -17,7 +18,7 @@ export class ClassValidatePipe implements PipeTransform<any> {
       const errText = errors
         .map((err: any) => Object.values(err.constraints).join(';'))
         .join(';');
-      throw new BadRequestException(errText);
+      throw new HttpException(errText, HttpStatus.OK);
     }
     return value;
   }
