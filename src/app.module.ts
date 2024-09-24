@@ -14,6 +14,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthorizationModule } from './common/authorization/authorization.module';
 import { join } from 'path';
 import { BookModule } from './book/book.module';
+
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -49,6 +50,14 @@ import { BookModule } from './book/book.module';
       global: true,
     }),
     BookModule,
+    // WinstonModule.forRoot({
+    //   level: 'debug',
+    //   transports: [
+    //     new transports.Console({
+    //       format: format.combine(format.colorize()),
+    //     }),
+    //   ],
+    // }),
     // WechatyModule,
   ],
   controllers: [AppController],
