@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { UploadController } from './upload.controller';
 import { UploadService } from './upload.service';
 import { MulterModule } from '@nestjs/platform-express';
@@ -8,16 +8,6 @@ import { extname } from 'path';
 @Module({
   imports: [
     MulterModule.register({
-      fileFilter(req, file, callback) {
-        if (file.mimetype.match(/csv/)) {
-          callback(null, true);
-        } else {
-          callback(
-            new HttpException('请上传csv文件', HttpStatus.BAD_REQUEST),
-            false,
-          );
-        }
-      },
       storage: diskStorage({
         destination: './uploads/',
         filename(req, file, callback) {
