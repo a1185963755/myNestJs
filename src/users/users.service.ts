@@ -46,4 +46,16 @@ export class UsersService {
     });
     return user;
   }
+
+  async findUserByEmail(email: string) {
+    const user = await this.entityManager.findOne(UserEntity, {
+      where: {
+        email,
+      },
+    });
+    if (!user) {
+      throw new HttpException('用户不存在', HttpStatus.OK);
+    }
+    return user;
+  }
 }

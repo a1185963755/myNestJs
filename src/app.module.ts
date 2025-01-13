@@ -15,6 +15,7 @@ import { AuthorizationModule } from './common/authorization/authorization.module
 import { join } from 'path';
 import { BookModule } from './book/book.module';
 import { MailModule } from './mail/mail.module';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { MailModule } from './mail/mail.module';
     }),
     BookModule,
     MailModule,
+    RedisModule,
     // WinstonModule.forRoot({
     //   level: 'debug',
     //   transports: [

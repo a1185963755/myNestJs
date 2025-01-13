@@ -11,4 +11,9 @@ export class MailController {
     const res = await this.mailService.sendMail(obj);
     return res;
   }
+  @Post('code')
+  async sendCode(@Body('email') email: string) {
+    const res = await this.mailService.sendCode(email);
+    return res;
+  }
 }

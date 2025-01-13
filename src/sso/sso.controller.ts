@@ -12,6 +12,7 @@ import { SsoService } from './sso.service';
 import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from 'src/users/users.service';
 import { SsoLoginDto } from './dto/sso-login.dto';
+import { SsoEmailLoginDto } from './dto/sso-email-login.dto';
 
 @Controller('sso')
 export class SsoController {
@@ -21,10 +22,18 @@ export class SsoController {
   ) {}
 
   @Post('login')
-  async create(@Body() ssoBody: SsoLoginDto) {
+  async loginByPwd(@Body() ssoBody: SsoLoginDto) {
     const user = await this.ssoService.validateUser(
       ssoBody.username,
       ssoBody.password,
+    );
+    return this.ssoService.login(user);
+  }
+  @Post('emailLogin')
+  async loginByEmail(@Body() ssoBody: SsoEmailLoginDto) {
+    const user = await this.ssoService.validateUserByEmail(
+      ssoBody.email,
+      ssoBody.code,
     );
     return this.ssoService.login(user);
   }
