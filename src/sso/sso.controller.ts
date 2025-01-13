@@ -7,6 +7,7 @@ import {
   Param,
   HttpException,
   HttpStatus,
+  Session,
 } from '@nestjs/common';
 import { SsoService } from './sso.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -22,11 +23,12 @@ export class SsoController {
   ) {}
 
   @Post('login')
-  async loginByPwd(@Body() ssoBody: SsoLoginDto) {
+  async loginByPwd(@Body() ssoBody: SsoLoginDto, @Session() session: any) {
     const user = await this.ssoService.validateUser(
       ssoBody.username,
       ssoBody.password,
     );
+    session.user = user;
     return this.ssoService.login(user);
   }
   @Post('emailLogin')

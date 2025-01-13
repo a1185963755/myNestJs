@@ -16,9 +16,13 @@ import { join } from 'path';
 import { BookModule } from './book/book.module';
 import { MailModule } from './mail/mail.module';
 import { RedisModule } from './redis/redis.module';
+import { ArticleModule } from './article/article.module';
+import { TaskModule } from './task/task.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: 'localhost',
@@ -54,6 +58,10 @@ import { RedisModule } from './redis/redis.module';
     BookModule,
     MailModule,
     RedisModule,
+    ArticleModule,
+
+    TaskModule,
+
     // WinstonModule.forRoot({
     //   level: 'debug',
     //   transports: [
