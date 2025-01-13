@@ -1,7 +1,7 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { WechatyBuilder } from 'wechaty';
+import { WechatyBuilder, ScanStatus } from 'wechaty';
 import { WechatyInterface } from 'wechaty/impls';
-
+import qrTerm from 'qrcode-terminal';
 @Injectable()
 export class WechatyService implements OnModuleInit {
   private bot: WechatyInterface | null = null;
@@ -9,20 +9,34 @@ export class WechatyService implements OnModuleInit {
     this.bot = WechatyBuilder.build();
     // 监听机器人启动
     this.bot.on('scan', (qrcode, status) => {
-      console.log('🚀 ~ WechatyService ~ this.bot.on ~ qrcode:', qrcode);
-      console.log(
-        `Scan QR Code to login: ${status}\nhttps://wechaty.js.org/qrcode/${encodeURIComponent(qrcode)}`,
-      );
+      if (status === ScanStatus.Waiting || status === ScanStatus.Timeout) {
+        qrTerm.generate(qrcode, { small: true }); // show qrcode on console
+
+        const qrcodeImageUrl = [
+          'https://wechaty.js.org/qrcode/',
+          encodeURIComponent(qrcode),
+        ].join('');
+
+        console.info(
+          'StarterBot',
+          'onScan: %s(%s) - %s',
+          ScanStatus[status],
+          status,
+          qrcodeImageUrl,
+        );
+      } else {
+        console.info(
+          'StarterBot',
+          'onScan: %s(%s)',
+          ScanStatus[status],
+          status,
+        );
+      }
     });
 
     // 监听登录事件
     this.bot.on('login', async (user) => {
       console.log(`User ${user} logged in`);
-      const contactList = await this.bot?.Contact.findAll();
-      console.log(
-        '🚀 ~ WechatyService ~ this.bot.on ~ contactList:',
-        contactList,
-      );
     });
 
     // 监听消息事件
@@ -36,6 +50,7 @@ export class WechatyService implements OnModuleInit {
   }
 
   private async onMessage(msg: any) {
+    console.log('🚀 ~ WechatyService ~ onMessage ~ msg:', msg);
     const text = msg.text();
     const contact = msg.talker();
 
