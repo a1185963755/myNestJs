@@ -14,7 +14,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthorizationModule } from './common/authorization/authorization.module';
 import { join } from 'path';
 import { BookModule } from './book/book.module';
-import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -46,12 +45,11 @@ import { MailModule } from './mail/mail.module';
     }),
     WeatherModule,
     AuthorizationModule.register({
-      modelPath: join(__dirname, './assets/casbin/model.conf'),
-      policyAdapter: join(__dirname, './assets/casbin/policy.csv'),
+      modelPath: join(__dirname, '../casbin/model.conf'),
+      policyAdapter: join(__dirname, '../casbin/policy.csv'),
       global: true,
     }),
     BookModule,
-    MailModule,
     // WinstonModule.forRoot({
     //   level: 'debug',
     //   transports: [

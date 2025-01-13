@@ -18,6 +18,5 @@
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "strict": false
-  },
-  "include": ["src/**/*.ts", "src/common/casbin/**/*"]
+  }
 }

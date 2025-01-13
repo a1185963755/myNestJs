@@ -86,6 +86,6 @@ export class BookController {
     }),
   )
   async upload(@UploadedFile() file: Express.Multer.File) {
-    return this.uploadService.uploadFile([file]);
+    return this.uploadService.uploadFile(file);
   }
 }
