@@ -1,7 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import { HttpStatus, HttpException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { LazyModuleLoader } from '@nestjs/core';
 import { firstValueFrom } from 'rxjs';
 
 @Injectable()
@@ -10,7 +9,6 @@ export class WeatherService {
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
-    private readonly lazyModuleLoader: LazyModuleLoader,
   ) {
     this.weather_api_key = this.configService.get('WEATHER_API_KEY') || '';
   }

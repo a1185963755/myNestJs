@@ -22,5 +22,6 @@ async function bootstrap() {
   app.useGlobalInterceptors(new TransformIntercepter());
   app.useStaticAssets('uploads', { prefix: '/static' });
   await app.listen(port);
+  console.log(`Application is running on: ${port}`);
 }
 bootstrap();
