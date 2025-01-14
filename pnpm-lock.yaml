@@ -47,6 +47,9 @@ importers:
       axios:
         specifier: ^1.7.4
         version: 1.7.4(debug@2.6.9)
+      base62:
+        specifier: ^2.0.2
+        version: 2.0.2
       bcrypt:
         specifier: ^5.1.1
         version: 5.1.1
@@ -2250,6 +2253,10 @@ packages:
 
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
+
+  base62@2.0.2:
+    resolution: {integrity: sha512-FLoAQzMpmdDBei0u7fUAQzVCxoH6g4pueCIuGDoCZVZCiCeW4qTKpEGB79jkS15VB8b/5EIHc4R+WSKTByM+dw==}
+    engines: {node: '>=6.0.0'}
 
   base64-js@1.5.1:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
@@ -8891,6 +8898,8 @@ snapshots:
       babel-preset-current-node-syntax: 1.0.1(@babel/core@7.24.9)
 
   balanced-match@1.0.2: {}
+
+  base62@2.0.2: {}
 
   base64-js@1.5.1: {}
 

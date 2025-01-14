@@ -3,7 +3,6 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { ClassValidatePipe } from 'src/pipes/parse-int/class-validate.pipe';
-import { TransformIntercepter } from './common/interceptors/transform.interceptor';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import session from 'express-session';
 async function bootstrap() {
@@ -26,7 +25,6 @@ async function bootstrap() {
   app.enableShutdownHooks();
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalPipes(new ClassValidatePipe());
-  app.useGlobalInterceptors(new TransformIntercepter());
   app.useStaticAssets('uploads', { prefix: '/static' });
 
   await app.listen(port);

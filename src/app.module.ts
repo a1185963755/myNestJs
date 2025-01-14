@@ -22,6 +22,8 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { RequestLogInterceptor } from './common/interceptors/request-log.interceptor';
+import { ShortUrlModule } from './short-url/short-url.module';
+import { TransformIntercepter } from './common/interceptors/transform.interceptor';
 
 @Module({
   imports: [
@@ -69,6 +71,8 @@ import { RequestLogInterceptor } from './common/interceptors/request-log.interce
 
     TaskModule,
 
+    ShortUrlModule,
+
     // WinstonModule.forRoot({
     //   level: 'debug',
     //   transports: [
@@ -85,6 +89,10 @@ import { RequestLogInterceptor } from './common/interceptors/request-log.interce
     {
       provide: APP_INTERCEPTOR,
       useClass: RequestLogInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: TransformIntercepter,
     },
   ],
 })

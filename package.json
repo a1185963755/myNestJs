@@ -35,6 +35,7 @@
     "@nestjs/typeorm": "^10.0.2",
     "@types/express-session": "^1.18.1",
     "axios": "^1.7.4",
+    "base62": "^2.0.2",
     "bcrypt": "^5.1.1",
     "casbin": "^5.30.0",
     "class-transformer": "^0.5.1",
