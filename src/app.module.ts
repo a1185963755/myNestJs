@@ -20,6 +20,8 @@ import { ArticleModule } from './article/article.module';
 import { TaskModule } from './task/task.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { RequestLogInterceptor } from './common/interceptors/request-log.interceptor';
 
 @Module({
   imports: [
@@ -78,7 +80,13 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     // WechatyModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: RequestLogInterceptor,
+    },
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
