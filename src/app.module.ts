@@ -19,9 +19,14 @@ import { RedisModule } from './redis/redis.module';
 import { ArticleModule } from './article/article.module';
 import { TaskModule } from './task/task.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
+    EventEmitterModule.forRoot({
+      wildcard: true,
+      delimiter: '.',
+    }),
     ScheduleModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'mysql',
