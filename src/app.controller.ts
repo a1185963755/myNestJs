@@ -1,9 +1,10 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Inject, Query } from '@nestjs/common';
 import { AppService } from './app.service';
 import { ConfigService } from '@nestjs/config';
 import { ModuleRef } from '@nestjs/core';
 import pinyin from 'pinyin';
-
+import { MINIO_CLIENT } from './minio/minio.module';
+import * as Minio from 'minio';
 @Controller()
 export class AppController {
   private readonly appService: AppService;
@@ -40,5 +41,24 @@ export class AppController {
     return {
       result: res.join(''),
     };
+  }
+
+  @Inject(MINIO_CLIENT)
+  private minioClient: Minio.Client;
+
+  @Get('test')
+  async test() {
+    try {
+      await this.minioClient.fPutObject('aaa', 'hello.json', './package.json');
+      return 'http://localhost:9000/aaa/hello.json';
+    } catch (e) {
+      console.log(e);
+      return '上传失败';
+    }
+  }
+
+  @Get('presignedUrl')
+  async presignedUrl(@Query('name') name: string) {
+    return this.minioClient.presignedPutObject('aaa', name, 3600);
   }
 }

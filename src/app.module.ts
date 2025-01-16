@@ -24,7 +24,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { RequestLogInterceptor } from './common/interceptors/request-log.interceptor';
 import { ShortUrlModule } from './short-url/short-url.module';
 import { TransformIntercepter } from './common/interceptors/transform.interceptor';
-
+import { MinioModule } from './minio/minio.module';
 @Module({
   imports: [
     EventEmitterModule.forRoot({
@@ -68,10 +68,9 @@ import { TransformIntercepter } from './common/interceptors/transform.intercepto
     MailModule,
     RedisModule,
     ArticleModule,
-
     TaskModule,
-
     ShortUrlModule,
+    MinioModule,
 
     // WinstonModule.forRoot({
     //   level: 'debug',
