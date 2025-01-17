@@ -44,6 +44,9 @@ importers:
       '@types/express-session':
         specifier: ^1.18.1
         version: 1.18.1
+      '@types/qrcode':
+        specifier: ^1.5.5
+        version: 1.5.5
       axios:
         specifier: ^1.7.4
         version: 1.7.4(debug@2.6.9)
@@ -92,6 +95,9 @@ importers:
       pinyin:
         specifier: 4.0.0-alpha.2
         version: 4.0.0-alpha.2
+      qrcode:
+        specifier: ^1.5.4
+        version: 1.5.4
       qrcode-terminal:
         specifier: ^0.12.0
         version: 0.12.0
@@ -1860,6 +1866,9 @@ packages:
 
   '@types/qrcode-terminal@0.12.2':
     resolution: {integrity: sha512-v+RcIEJ+Uhd6ygSQ0u5YYY7ZM+la7GgPbs0V/7l/kFs2uO4S8BcIUEMoP7za4DNIqNnUD5npf0A/7kBhrCKG5Q==}
+
+  '@types/qrcode@1.5.5':
+    resolution: {integrity: sha512-CdfBi/e3Qk+3Z/fXYShipBT13OJ2fDO2Q2w5CIP5anLTLIndQG9z6P1cnm+8zCWSpm5dnxMFd/uREtb0EXuQzg==}
 
   '@types/qs@6.9.15':
     resolution: {integrity: sha512-uXHQKES6DQKKCLh441Xv/dwxOq1TVS3JPUMlEqoEglvlhR6Mxnlew/Xq/LRVHpLyk7iK3zODe1qYHIMltO7XGg==}
@@ -8585,6 +8594,10 @@ snapshots:
   '@types/pinyin@2.10.2': {}
 
   '@types/qrcode-terminal@0.12.2': {}
+
+  '@types/qrcode@1.5.5':
+    dependencies:
+      '@types/node': 20.14.11
 
   '@types/qs@6.9.15': {}
 
