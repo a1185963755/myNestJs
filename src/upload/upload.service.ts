@@ -9,6 +9,7 @@ import {
   cpSync,
   mkdirSync,
 } from 'fs';
+import sharp from 'sharp';
 
 @Injectable()
 export class UploadService {
@@ -66,5 +67,17 @@ export class UploadService {
     cpSync(chunk[0].path, `${chunkDir}/${name}`);
     rmSync(chunk[0].path);
     return '分片上传成功';
+  }
+
+  async compression(path: string, color: number) {
+    const data = await sharp(path, {
+      animated: true,
+      limitInputPixels: false,
+    })
+      .gif({
+        colours: color,
+      })
+      .toBuffer();
+    return data;
   }
 }

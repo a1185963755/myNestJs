@@ -6,12 +6,15 @@ type ExceptionResponse = {
 };
 export class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
-    console.log('🚀 ~ HttpExceptionFilter ~ exception:', exception);
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
-    const status = exception?.getStatus();
-    const exceptionResponse = exception.getResponse() as ExceptionResponse;
+    const status =
+      exception instanceof HttpException ? exception?.getStatus() : 500;
+    const exceptionResponse =
+      exception instanceof HttpException
+        ? (exception.getResponse() as ExceptionResponse)
+        : exception;
     response.status(status).json({
       errCode: exceptionResponse?.code || status,
       errMsg: exceptionResponse?.msg || exception.message,
