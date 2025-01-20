@@ -27,8 +27,28 @@ import { TransformIntercepter } from './common/interceptors/transform.intercepto
 import { MinioModule } from './minio/minio.module';
 import { QrcodeModule } from './qrcode/qrcode.module';
 import { SystemModule } from './system/system.module';
+import {
+  AcceptLanguageResolver,
+  CookieResolver,
+  HeaderResolver,
+  I18nModule,
+  QueryResolver,
+} from 'nestjs-i18n';
 @Module({
   imports: [
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      loaderOptions: {
+        path: join(__dirname, '/i18n/'),
+        watch: true,
+      },
+      resolvers: [
+        new QueryResolver(['lang', 'l']),
+        new HeaderResolver(['x-custom-lang']),
+        new CookieResolver(['lang']),
+        AcceptLanguageResolver,
+      ],
+    }),
     EventEmitterModule.forRoot({
       wildcard: true,
       delimiter: '.',

@@ -2,9 +2,10 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
-import { ClassValidatePipe } from 'src/pipes/parse-int/class-validate.pipe';
+// import { ClassValidatePipe } from 'src/pipes/parse-int/class-validate.pipe';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import session from 'express-session';
+import { I18nValidationPipe, I18nValidationExceptionFilter } from 'nestjs-i18n';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.use(
@@ -24,7 +25,15 @@ async function bootstrap() {
   const port = configService.get('PORT');
   app.enableShutdownHooks();
   app.useGlobalFilters(new HttpExceptionFilter());
-  app.useGlobalPipes(new ClassValidatePipe());
+  // app.useGlobalPipes(new ClassValidatePipe());
+  app.useGlobalPipes(new I18nValidationPipe());
+
+  app.useGlobalFilters(
+    new I18nValidationExceptionFilter({
+      detailedErrors: false,
+    }),
+  );
+
   app.useStaticAssets('uploads', { prefix: '/static' });
 
   await app.listen(port);

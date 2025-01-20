@@ -15,6 +15,10 @@ export class AppController {
   ) {
     this.appService = this.moduleRef.get(AppService);
   }
+  @Get('')
+  async i18ntest() {
+    return this.appService.getHello();
+  }
 
   @Get('todos')
   async getTodos() {
