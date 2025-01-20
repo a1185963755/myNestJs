@@ -26,6 +26,7 @@ import { ShortUrlModule } from './short-url/short-url.module';
 import { TransformIntercepter } from './common/interceptors/transform.interceptor';
 import { MinioModule } from './minio/minio.module';
 import { QrcodeModule } from './qrcode/qrcode.module';
+import { SystemModule } from './system/system.module';
 @Module({
   imports: [
     EventEmitterModule.forRoot({
@@ -73,6 +74,7 @@ import { QrcodeModule } from './qrcode/qrcode.module';
     ShortUrlModule,
     MinioModule,
     QrcodeModule,
+    SystemModule,
 
     // WinstonModule.forRoot({
     //   level: 'debug',

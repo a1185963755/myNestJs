@@ -32,4 +32,12 @@ export class RedisService {
   async keys(pattern: string) {
     return await this.redisClient.keys(pattern);
   }
+  /**
+   * 设置键的过期时间
+   * @param key Redis键名
+   * @param ttl 过期时间（秒）
+   */
+  async expire(key: string, ttl: number) {
+    return await this.redisClient.expire(key, ttl);
+  }
 }

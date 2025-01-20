@@ -91,6 +91,9 @@ export class QrcodeController {
       5 * 60, // 保持5分钟有效期
     );
 
+    // 立即将二维码过期时间设置为0
+    await this.redisService.expire(`qrcode_${id}`, 0);
+
     return {
       qrcode_id: id,
       status: QrCodeStatus.scan_confirm,
