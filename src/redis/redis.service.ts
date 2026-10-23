@@ -16,6 +16,13 @@ export class RedisService {
     return value;
   }
 
+  /**
+   * 探活：返回 'PONG' 表示连接可用（供 HealthModule 的 Redis 指标调用）
+   */
+  async ping() {
+    return await this.redisClient.ping();
+  }
+
   async hashGet(key: string) {
     return await this.redisClient.hGetAll(key);
   }
@@ -31,6 +38,10 @@ export class RedisService {
   }
   async keys(pattern: string) {
     return await this.redisClient.keys(pattern);
+  }
+  /** 删除键（用于一次性验证码等场景）。 */
+  async del(key: string) {
+    return await this.redisClient.del(key);
   }
   /**
    * 设置键的过期时间

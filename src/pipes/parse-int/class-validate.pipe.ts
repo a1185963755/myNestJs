@@ -1,3 +1,4 @@
+import { ValidationError } from 'class-validator';
 import {
   ArgumentMetadata,
   HttpException,
@@ -7,8 +8,8 @@ import {
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 
-export class ClassValidatePipe implements PipeTransform<any> {
-  async transform(value: any, { metatype }: ArgumentMetadata) {
+export class ClassValidatePipe implements PipeTransform<unknown> {
+  async transform(value: unknown, { metatype }: ArgumentMetadata) {
     if (!metatype || !this.toValidate(metatype)) {
       return value;
     }
@@ -16,9 +17,16 @@ export class ClassValidatePipe implements PipeTransform<any> {
     const errors = await validate(object);
     if (errors.length > 0) {
       const errText = errors
-        .map((err: any) => Object.values(err.constraints).join(';'))
+        .map((err: ValidationError) =>
+          Object.values(err.constraints ?? {}).join(';'),
+        )
+        .filter(Boolean)
         .join(';');
-      throw new HttpException(errText, HttpStatus.OK);
+      // 校验失败属于客户端错误，返回 400 而不是 200
+      throw new HttpException(
+        errText || '参数校验失败',
+        HttpStatus.BAD_REQUEST,
+      );
     }
     return value;
   }

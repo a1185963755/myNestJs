@@ -1,33 +1,47 @@
-import { Controller, Get, Inject, Param, Headers } from '@nestjs/common';
+import { Controller, Get, Inject, Param, Req, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { QrcodeService } from './qrcode.service';
 import { RedisService } from 'src/redis/redis.service';
 import { QrCodeStatus } from './types';
+import type { AuthenticatedRequest } from 'src/common/types/auth.types';
+
+/** 二维码状态在 Redis 中的存活时间（秒） */
+const QRCODE_TTL = 5 * 60;
+/** 确认后记录扫码用户的 key 存活时间（秒） */
+const QRCODE_USER_TTL = 5 * 60;
 
 @Controller('qrcode')
 export class QrcodeController {
-  constructor(private readonly qrcodeService: QrcodeService) {}
-  @Inject()
-  private readonly redisService: RedisService;
+  constructor(
+    private readonly qrcodeService: QrcodeService,
+    @Inject(RedisService) private readonly redisService: RedisService,
+  ) {}
+
   @Get('generate')
   async generate() {
     const data = await this.qrcodeService.generateQrCode();
     await this.redisService.set(
       `qrcode_${data.qrcode_id}`,
       QrCodeStatus.noscan,
-      5 * 60,
+      QRCODE_TTL,
     );
     return data;
   }
 
   @Get('status/:id')
   async checkStatus(@Param('id') id: string) {
-    return await this.qrcodeService.check(id);
+    const status = await this.qrcodeService.check(id);
+    if (status.status === QrCodeStatus.scan_confirm) {
+      const userId = await this.redisService.get(`qrcode_user_${id}`);
+      return { ...status, userId: userId ? Number(userId) : undefined };
+    }
+    return status;
   }
+
   @Get('scan/:id')
   async scanQrCode(@Param('id') id: string) {
     const status = await this.redisService.get(`qrcode_${id}`);
 
-    // 检查二维码是否存在
     if (!status) {
       return {
         qrcode_id: id,
@@ -36,7 +50,6 @@ export class QrcodeController {
       };
     }
 
-    // 检查二维码状态是否允许扫描
     if (status !== QrCodeStatus.noscan) {
       return {
         qrcode_id: id,
@@ -45,11 +58,10 @@ export class QrcodeController {
       };
     }
 
-    // 更新二维码状态为等待确认
     await this.redisService.set(
       `qrcode_${id}`,
       QrCodeStatus.scan_wait_confirm,
-      5 * 60, // 保持5分钟有效期
+      QRCODE_TTL,
     );
 
     return {
@@ -58,15 +70,21 @@ export class QrcodeController {
       message: '请确认登录',
     };
   }
+
+  /**
+   * 确认登录：必须携带有效 JWT。
+   *
+   * 之前这里只读 Authorization 头打印一下就放行，等于任何人都能确认任意二维码。
+   * 现在由 AuthGuard 校验 token，并把登录用户记到 qrcode_user_{id}。
+   */
+  @UseGuards(AuthGuard('jwt'))
   @Get('confirm/:id')
   async confirmQrCode(
     @Param('id') id: string,
-    @Headers('Authorization') auth: string,
+    @Req() req: AuthenticatedRequest,
   ) {
-    console.log(auth);
     const status = await this.redisService.get(`qrcode_${id}`);
 
-    // 检查二维码是否存在
     if (!status) {
       return {
         qrcode_id: id,
@@ -75,7 +93,6 @@ export class QrcodeController {
       };
     }
 
-    // 检查二维码状态是否允许确认
     if (status !== QrCodeStatus.scan_wait_confirm) {
       return {
         qrcode_id: id,
@@ -84,15 +101,17 @@ export class QrcodeController {
       };
     }
 
-    // 更新二维码状态为已确认
+    // 记录确认人，并保留状态一段时间供前端轮询到 scan-confirm
     await this.redisService.set(
       `qrcode_${id}`,
       QrCodeStatus.scan_confirm,
-      5 * 60, // 保持5分钟有效期
+      QRCODE_TTL,
     );
-
-    // 立即将二维码过期时间设置为0
-    await this.redisService.expire(`qrcode_${id}`, 0);
+    await this.redisService.set(
+      `qrcode_user_${id}`,
+      String(req.user!.userId),
+      QRCODE_USER_TTL,
+    );
 
     return {
       qrcode_id: id,
@@ -100,11 +119,11 @@ export class QrcodeController {
       message: '登录成功',
     };
   }
+
   @Get('cancel/:id')
   async cancelQrCode(@Param('id') id: string) {
     const status = await this.redisService.get(`qrcode_${id}`);
 
-    // 检查二维码是否存在
     if (!status) {
       return {
         qrcode_id: id,
@@ -113,7 +132,6 @@ export class QrcodeController {
       };
     }
 
-    // 检查二维码状态是否允许取消
     if (status !== QrCodeStatus.scan_wait_confirm) {
       return {
         qrcode_id: id,
@@ -122,11 +140,10 @@ export class QrcodeController {
       };
     }
 
-    // 更新二维码状态为已取消
     await this.redisService.set(
       `qrcode_${id}`,
       QrCodeStatus.scan_cancel,
-      5 * 60, // 保持5分钟有效期
+      QRCODE_TTL,
     );
 
     return {

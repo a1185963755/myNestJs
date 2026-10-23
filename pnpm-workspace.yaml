@@ -1,0 +1,9 @@
+allowBuilds:
+  '@compodoc/compodoc': true
+  '@nestjs/core': true
+  '@swc/core': true
+  bcrypt: true
+  leveldown: true
+  protobufjs: true
+  puppeteer: true
+  sharp: true

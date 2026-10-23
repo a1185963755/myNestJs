@@ -1,8 +1,22 @@
+# Casbin 策略（RBAC + keyMatch2 路径匹配）
+#
+# 主体：role:<角色名>，对应 user 表的 role 字段
+# 动作：read / create / update / delete，* 表示全部
+# 路径：支持 :param 与 *（keyMatch2），匹配的是 Nest 的完整路由，如 /users/:username
+#
+# 未命中任何策略 = 拒绝（默认拒绝）。
+
+# ---- admin：全部权限 ----
 p, role:admin, /users, *
 p, role:admin, /users/:username, *
+p, role:admin, /system/status, *
+p, role:admin, /mail/send, *
+
+# ---- staff：只读用户列表/详情 ----
 p, role:staff, /users, read
 p, role:staff, /users/:username, read
+
+# ---- manager：可注册用户，其余继承 staff ----
 p, role:manager, /users/register, create
-p, role:manager, /users/:username, update
 
 g, role:manager, role:staff

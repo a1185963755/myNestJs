@@ -1,0 +1,41 @@
+# 只编排应用本身；MySQL / Redis 使用宿主机上已有的 Docker 容器
+# （通过 host.docker.internal 访问其映射到宿主机的 3306 / 6379 端口）
+#
+# 密钥放在同目录的 .env 里（docker compose 会自动读取该文件做变量插值），
+# 不要把密钥写进本文件。参考 .env.example 准备 .env。
+services:
+  app:
+    build: .
+    container_name: mynestjs-app
+    ports:
+      - '3334:3333'
+    environment:
+      NODE_ENV: production
+      PORT: '3333'
+      MYSQL_HOST: host.docker.internal
+      MYSQL_PORT: '3306'
+      MYSQL_USER: ${MYSQL_USER:-root}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-mydb}
+      REDIS_HOST: host.docker.internal
+      REDIS_PORT: '6379'
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      # 生产环境务必保持 false，改表请用迁移
+      DB_SYNCHRONIZE: 'false'
+      JWT_SECRET: ${JWT_SECRET:?请在 .env 中设置 JWT_SECRET}
+      SESSION_SECRET: ${SESSION_SECRET:?请在 .env 中设置 SESSION_SECRET}
+      CORS_ORIGIN: ${CORS_ORIGIN:-}
+      MAIL_HOST: ${MAIL_HOST:-smtp.qq.com}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USER: ${MAIL_USER:-}
+      MAIL_PASS: ${MAIL_PASS:-}
+      MAIL_FROM: ${MAIL_FROM:-}
+      WEATHER_API_KEY: ${WEATHER_API_KEY:-}
+      FEISHU_WEBHOOK_URL: ${FEISHU_WEBHOOK_URL:-}
+      FEISHU_SECRET: ${FEISHU_SECRET:-}
+    volumes:
+      - ./uploads:/app/uploads
+    restart: unless-stopped
+    extra_hosts:
+      # Docker Desktop 自带 host.docker.internal；这行让 Linux 服务器上也能用
+      - 'host.docker.internal:host-gateway'

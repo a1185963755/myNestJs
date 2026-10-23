@@ -1,30 +1,27 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import * as nodemailer from 'nodemailer';
 import { MailService } from './mail.service';
 import { MailController } from './mail.controller';
-import nodemailer from 'nodemailer';
-import { ConfigService } from '@nestjs/config';
 
 @Module({
+  imports: [ConfigModule],
   controllers: [MailController],
   providers: [
     MailService,
     {
       provide: 'TRANSPORTER',
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
-        const user = configService.get('MAIL_USER');
-        const pass = configService.get('MAIL_PASS');
-        const transporter = nodemailer.createTransport({
-          host: 'smtp.qq.com',
-          port: 587,
+      useFactory: (configService: ConfigService) =>
+        nodemailer.createTransport({
+          host: configService.get<string>('MAIL.host'),
+          port: configService.get<number>('MAIL.port'),
           secure: false,
           auth: {
-            user,
-            pass,
+            user: configService.get<string>('MAIL.user'),
+            pass: configService.get<string>('MAIL.pass'),
           },
-        });
-        return transporter;
-      },
+        }),
     },
   ],
 })

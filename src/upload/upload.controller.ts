@@ -8,10 +8,9 @@ import {
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
-import { UploadService } from './upload.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { existsSync } from 'fs';
 import { Response } from 'express';
+import { UploadService } from './upload.service';
 
 @Controller('upload')
 export class UploadController {
@@ -40,17 +39,18 @@ export class UploadController {
     return this.uploadService.mergeChunks(name);
   }
 
+  /**
+   * GIF 压缩下载。
+   *
+   * 传入的 path 必须是 uploads 目录内的相对路径 —— 之前直接把 body.path
+   * 丢给 sharp 读文件，`../../etc/passwd` 之类的路径可以任意读取服务器文件。
+   */
   @Post('compression')
   async compression(
     @Body('path') filePath: string,
     @Body('color', ParseIntPipe) color: number,
     @Res() res: Response,
   ) {
-    console.log(filePath, color);
-
-    if (!existsSync(filePath)) {
-      throw new BadRequestException('文件不存在');
-    }
     const buffer = await this.uploadService.compression(filePath, color);
     res.set('Content-Disposition', `attachment; filename="dest.gif"`);
     res.send(buffer);

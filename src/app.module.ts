@@ -1,7 +1,8 @@
-import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { LoggerMiddleware } from './common/middleware/logger/logger.middleware';
+import { CommonModule } from './common/common.module';
+import { HealthModule } from './health/health.module';
 import { UploadModule } from './upload/upload.module';
 import { SsoModule } from './sso/sso.module';
 import { UsersModule } from './users/users.module';
@@ -10,7 +11,6 @@ import configurationFactory from './common/config/configuration.factory';
 import { HttpModule } from '@nestjs/axios';
 import { WeatherModule } from './weather/weather.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-// import { WechatyModule } from './wechaty/wechaty.module';
 import { AuthorizationModule } from './common/authorization/authorization.module';
 import { join } from 'path';
 import { BookModule } from './book/book.module';
@@ -20,13 +20,10 @@ import { ArticleModule } from './article/article.module';
 import { TaskModule } from './task/task.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { EventEmitterModule } from '@nestjs/event-emitter';
-import { APP_INTERCEPTOR } from '@nestjs/core';
-import { RequestLogInterceptor } from './common/interceptors/request-log.interceptor';
 import { ShortUrlModule } from './short-url/short-url.module';
-import { TransformIntercepter } from './common/interceptors/transform.interceptor';
-import { MinioModule } from './minio/minio.module';
 import { QrcodeModule } from './qrcode/qrcode.module';
 import { SystemModule } from './system/system.module';
+import { FeishuModule } from './feishu/feishu.module';
 import {
   AcceptLanguageResolver,
   CookieResolver,
@@ -34,8 +31,19 @@ import {
   I18nModule,
   QueryResolver,
 } from 'nestjs-i18n';
+
 @Module({
   imports: [
+    // 配置模块放最前：后面所有 forRootAsync 都依赖它
+    ConfigModule.forRoot({
+      load: [configurationFactory],
+      isGlobal: true,
+      envFilePath: ['.env.development', '.env'],
+    }),
+    // 全局 filter / interceptor / middleware 全部由 CommonModule 接管
+    CommonModule,
+    // 健康检查：/health 探针（MySQL / Redis / 内存），供 Docker HEALTHCHECK 使用
+    HealthModule,
     I18nModule.forRoot({
       fallbackLanguage: 'en',
       loaderOptions: {
@@ -54,31 +62,30 @@ import {
       delimiter: '.',
     }),
     ScheduleModule.forRoot(),
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: 'root',
-      database: 'mydb',
-      entities: [__dirname + '/**/*.entity{.ts,.js}'], // 自动加载实体
-      synchronize: true, // 自动同步数据库（生产环境下建议关闭）
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        type: 'mysql' as const,
+        host: config.get<string>('DB.host'),
+        port: config.get<number>('DB.port'),
+        username: config.get<string>('DB.username'),
+        password: config.get<string>('DB.password'),
+        database: config.get<string>('DB.database'),
+        entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        // 生产默认关闭，避免启动时自动改表结构
+        synchronize: config.get<boolean>('DB.synchronize') ?? false,
+      }),
     }),
     UsersModule,
     UploadModule,
     SsoModule,
-    ConfigModule.forRoot({
-      load: [configurationFactory],
-      isGlobal: true,
-    }),
     HttpModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: (config: ConfigService) => {
-        return {
-          timeout: config.get('HTTP_TIMEOUT'),
-        };
-      },
       inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        timeout: config.get<number>('HTTP_TIMEOUT'),
+      }),
     }),
     WeatherModule,
     AuthorizationModule.register({
@@ -92,35 +99,11 @@ import {
     ArticleModule,
     TaskModule,
     ShortUrlModule,
-    MinioModule,
     QrcodeModule,
     SystemModule,
-
-    // WinstonModule.forRoot({
-    //   level: 'debug',
-    //   transports: [
-    //     new transports.Console({
-    //       format: format.combine(format.colorize()),
-    //     }),
-    //   ],
-    // }),
-    // WechatyModule,
+    FeishuModule,
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: RequestLogInterceptor,
-    },
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: TransformIntercepter,
-    },
-  ],
+  providers: [AppService],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoggerMiddleware).forRoutes('/users');
-  }
-}
+export class AppModule {}

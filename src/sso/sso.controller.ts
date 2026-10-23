@@ -5,12 +5,11 @@ import {
   UseGuards,
   Get,
   Param,
-  HttpException,
-  HttpStatus,
+  NotFoundException,
   Session,
 } from '@nestjs/common';
-import { SsoService } from './sso.service';
 import { AuthGuard } from '@nestjs/passport';
+import { SsoService } from './sso.service';
 import { UsersService } from 'src/users/users.service';
 import { SsoLoginDto } from './dto/sso-login.dto';
 import { SsoEmailLoginDto } from './dto/sso-email-login.dto';
@@ -19,11 +18,14 @@ import { SsoEmailLoginDto } from './dto/sso-email-login.dto';
 export class SsoController {
   constructor(
     private readonly ssoService: SsoService,
-    private readonly UsersService: UsersService,
+    private readonly usersService: UsersService,
   ) {}
 
   @Post('login')
-  async loginByPwd(@Body() ssoBody: SsoLoginDto, @Session() session: any) {
+  async loginByPwd(
+    @Body() ssoBody: SsoLoginDto,
+    @Session() session: { user?: unknown },
+  ) {
     const user = await this.ssoService.validateUser(
       ssoBody.username,
       ssoBody.password,
@@ -31,6 +33,7 @@ export class SsoController {
     session.user = user;
     return this.ssoService.login(user);
   }
+
   @Post('emailLogin')
   async loginByEmail(@Body() ssoBody: SsoEmailLoginDto) {
     const user = await this.ssoService.validateUserByEmail(
@@ -43,12 +46,10 @@ export class SsoController {
   @UseGuards(AuthGuard('jwt'))
   @Get(':username')
   async getUser(@Param('username') username: string) {
-    const data = await this.UsersService.findOne(username);
+    const data = await this.usersService.findOne(username);
     if (!data) {
-      throw new HttpException('用户不存在', HttpStatus.BAD_REQUEST);
+      throw new NotFoundException('用户不存在');
     }
-    const { password, ...others } = data!;
-    console.log('🚀 ~ SsoController ~ getUser ~ password:', password);
-    return others;
+    return data;
   }
 }

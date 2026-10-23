@@ -5,3 +5,15 @@ node_modules/
 .vscode/
 .dockerignore
 .husky
+dist/
+uploads/
+documentation/
+test/
+coverage/
+1.js
+docker-compose*.yml
+
+# 环境变量文件（含密钥），构建镜像时不要打进去
+.env
+.env.*
+!.env.example

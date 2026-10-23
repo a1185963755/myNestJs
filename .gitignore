@@ -55,3 +55,9 @@ pids
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 /uploads
+# 本地真实配置（含密钥），只保留模板 .env.example
+.env.development
+.env
+
+# TypeScript 增量编译缓存
+*.tsbuildinfo

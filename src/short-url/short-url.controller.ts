@@ -15,10 +15,6 @@ import { SkipGlobalInterceptor } from 'src/common/decorators/skip-global.decorat
 export class ShortUrlController {
   constructor(private readonly shortUrlService: ShortUrlService) {}
 
-  @Get()
-  findAll() {
-    return this.shortUrlService.generateCode();
-  }
   @Get(':code')
   @Redirect()
   @SkipGlobalInterceptor()

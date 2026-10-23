@@ -1,42 +1,45 @@
 import {
+  Body,
   Controller,
   Get,
-  Post,
-  Body,
   Header,
-  UseInterceptors,
-  UseGuards,
+  NotFoundException,
+  Param,
+  Post,
   UsePipes,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { createUserSchema, CreateUserDto } from './dto/create-user.dto';
-
-import { UserName } from 'src/common/decorators/user-id/user-name.decorator';
-import { RoleGuard } from 'src/common/guards/role/role.guard';
+import { Auth } from 'src/common/decorators/auth/auth.decorator';
 import { ZodValidationPipe } from 'src/pipes/parse-int/zod-validate.pipe';
-import { DurationInterceptor } from 'src/common/interceptors/duration.interceptor';
 
 @Controller('users')
-@UseInterceptors(DurationInterceptor)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
-  @UseGuards(RoleGuard)
+
+  // 权限由 Casbin policy.csv 决定：admin/staff 可读，manager 继承 staff
+  @Auth()
   @Get()
   @Header('Cache-Control', 'no-cache, no-store, must-revalidate')
   async findAll() {
     return this.usersService.findAll();
   }
 
-  @UseGuards(RoleGuard)
+  // policy.csv: p, role:manager, /users/register, create（admin 为 *）
+  @Auth('admin', 'manager')
   @Post('register')
   @UsePipes(new ZodValidationPipe(createUserSchema))
-  async create(@Body() createCatDto: CreateUserDto) {
-    return this.usersService.register(createCatDto);
+  async create(@Body() createUserDto: CreateUserDto) {
+    return this.usersService.register(createUserDto);
   }
 
-  @UseGuards(RoleGuard)
+  @Auth()
   @Get(':username')
-  async findOne(@UserName() username: string) {
-    return this.usersService.findOne(username);
+  async findOne(@Param('username') username: string) {
+    const user = await this.usersService.findOne(username);
+    if (!user) {
+      throw new NotFoundException('用户不存在');
+    }
+    return user;
   }
 }
